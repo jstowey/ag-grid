@@ -2,9 +2,10 @@
   <div>
     <h5>List of countries</h5>
     <ag-grid-vue class="ag-theme-balham" style="width: 100%; height: 100vh"
-                 :columnDefs="columnDefs" :rowData="rowData"
+                 :gridOptions="gridOptions"
                  :frameworkComponents="frameworkComponents" :modules="modules"
-                 rowSelection="multiple" :context="context">
+                 @grid-ready="onGridReady"
+    >
     </ag-grid-vue>
   </div>
 </template>
@@ -23,11 +24,7 @@ export default {
   name: 'CountryTable',
   data() {
     return {
-      columnDefs: null,
-      rowData: null,
-      context: {
-        parentComponent: this,
-      },
+      gridApi: null,
       frameworkComponents: null,
       modules: AllCommunityModules,
     };
@@ -59,9 +56,32 @@ export default {
       removeButtonRenderer: RemoveButtonRenderer,
     };
   },
+  computed: {
+    gridOptions() {
+      return {
+        getRowNodeId(data) {
+          return data.code;
+        },
+        rowSelection: 'multiple',
+        columnDefs: this.columnDefs,
+        rowData: this.rowData,
+        context: {
+          parentComponent: this,
+        },
+      };
+    },
+  },
   methods: {
-    removeRow(rowIndex) {
-      console.log(rowIndex);
+    onGridReady(params) {
+      this.gridApi = params.api;
+    },
+    removeByCode(code) {
+      const rowNode = this.gridApi.getRowNode(code);
+
+      console.log(code, rowNode);
+      this.gridApi.updateRowData({
+        remove: [rowNode.data],
+      });
     },
   },
   components: {

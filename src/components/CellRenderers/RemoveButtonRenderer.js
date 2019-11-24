@@ -4,17 +4,9 @@ export default Vue.extend({
   template: `
         <el-button type="danger" @click="triggerDelete">Remove</el-button>
     `,
-  data() {
-    return {
-    };
-  },
-  beforeMount() {
-  },
-  mounted() {
-  },
   methods: {
     triggerDelete() {
-      this.params.context.parentComponent.removeRow(this.params.node.rowIndex);
+      this.params.context.parentComponent.removeByCode(this.params.node.data.code);
     },
   },
 });
