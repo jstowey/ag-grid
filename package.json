@@ -10,7 +10,7 @@
   "dependencies": {
     "@ag-grid-community/all-modules": "^22.0.0",
     "@ag-grid-community/vue": "^22.0.0",
-    "core-js": "^3.3.2",
+    "core-js": "^3.4.2",
     "element-ui": "^2.12.0",
     "vue": "^2.6.10",
     "vue-property-decorator": "^8.3.0",

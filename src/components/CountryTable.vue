@@ -4,7 +4,8 @@
     <ag-grid-vue class="ag-theme-balham" style="width: 100%; height: 100vh"
                  :gridOptions="gridOptions"
                  :frameworkComponents="frameworkComponents" :modules="modules"
-                 @grid-ready="onGridReady"
+                 v-model="rowData" @grid-ready="onGridReady"
+                 @data-model-changed="updateStore"
     >
     </ag-grid-vue>
   </div>
@@ -17,7 +18,6 @@ import '@ag-grid-community/all-modules/dist/styles/ag-theme-balham.css';
 import { AgGridVue } from '@ag-grid-community/vue';
 import { AllCommunityModules } from '@ag-grid-community/all-modules';
 // app imports
-import countries from '../assets/countries.json';
 import RemoveButtonRenderer from './CellRenderers/RemoveButtonRenderer';
 
 export default {
@@ -25,6 +25,7 @@ export default {
   data() {
     return {
       gridApi: null,
+      rowData: null,
       frameworkComponents: null,
       modules: AllCommunityModules,
     };
@@ -42,6 +43,7 @@ export default {
         headerName: 'Name',
         field: 'name',
         sortable: true,
+        editable: true,
         filter: true,
       },
       {
@@ -50,11 +52,18 @@ export default {
       },
     ];
 
-    this.rowData = countries;
-
     this.frameworkComponents = {
       removeButtonRenderer: RemoveButtonRenderer,
     };
+
+    const rowData = this.$store.state.countries;
+    this.rowData = Object.freeze(
+      rowData.map(row => {
+        return {
+          ...row,
+        };
+      }),
+    );
   },
   computed: {
     gridOptions() {
@@ -64,7 +73,6 @@ export default {
         },
         rowSelection: 'multiple',
         columnDefs: this.columnDefs,
-        rowData: this.rowData,
         context: {
           parentComponent: this,
         },
@@ -75,10 +83,12 @@ export default {
     onGridReady(params) {
       this.gridApi = params.api;
     },
+    updateStore(rowData) {
+      this.$store.dispatch('updateRowData', rowData);
+    },
     removeByCode(code) {
       const rowNode = this.gridApi.getRowNode(code);
 
-      console.log(code, rowNode);
       this.gridApi.updateRowData({
         remove: [rowNode.data],
       });
